@@ -1,3 +1,7 @@
+const Room = require('./modules/room');
+const Hotel = require('./modules/hotel');
+const UI = require('./modules/ui');
+
 const room1 = new Room(1, 'Single');
 const room2 = new Room(2, 'Double');
 const room3 = new Room(3, 'Suite');
