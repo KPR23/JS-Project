@@ -12,12 +12,11 @@ UI.prototype.renderRooms = function () {
     roomDiv.innerHTML = `
     <h3>Room ${room.number} (${room.type})</h3>
     <p>${room.isAvailable ? 'Available' : 'Booked'}</p>
-    <button onClick=bookRoom(${room.number})>${
-      room.isAvailable ? '' : 'disabled'
-    }</button>
-    <button onClick=checkOutRoom(${room.number})>${
-      room.isAvailable ? 'disabled' : ''
-    }</button>
+    ${
+      room.isAvailable
+        ? `<button onClick=bookRoom(${room.number})>Book Room</button>`
+        : `<button onClick=checkOutRoom(${room.number})>Check Out</button>`
+    }
     `;
 
     container.appendChild(roomDiv);
