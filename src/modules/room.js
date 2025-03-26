@@ -1,15 +1,17 @@
 function Room(number, type) {
-	this.number = number;
-	this.type = type;
-	this.isAvailable = true;
+  this.number = number;
+  this.type = type;
+  this.isAvailable = true;
 }
 
 Room.prototype.book = function () {
-	this.isAvailable = false;
+  this.isAvailable = false;
+  return `Room ${this.number} has been booked`;
 };
 
 Room.prototype.checkOut = function () {
-	this.isAvailable = true;
+  this.isAvailable = true;
+  return `Room ${this.number} has been checked out`;
 };
 
 module.exports = Room;
