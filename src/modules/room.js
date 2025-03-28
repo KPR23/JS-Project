@@ -11,8 +11,9 @@ class Room {
     const creditCardNumber = prompt(
       'Provide your credit card number to book the room'
     );
-    if (!/^\d{16}$/.test(creditCardNumber)) {
+    if (!creditCardNumber || !/^\d{16}$/.test(creditCardNumber)) {
       alert('Credit card number must be 16 digits');
+      return;
     }
     this.setCreditCardNumber(creditCardNumber);
     this.isAvailable = false;

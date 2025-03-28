@@ -1,6 +1,7 @@
 const Room = require('./modules/room');
 const Hotel = require('./modules/hotel');
 const UI = require('./modules/ui');
+const HotelAPI = require('./modules/hotelAPI');
 
 const room1 = new Room.Room(1, 'Single');
 const room2 = new Room.Room(2, 'Double');
@@ -54,5 +55,14 @@ window.checkOutRoom = function (number) {
     alert(room.checkOut());
     saveBookingsToLocalStorage();
     ui.renderRooms();
+  }
+};
+
+window.fetchReviews = async function (roomNumber) {
+  try {
+    const reviews = await HotelAPI.fetchReviews();
+    ui.displayReviews(roomNumber, reviews);
+  } catch (error) {
+    alert('Failed to load reviews. Please try again later.');
   }
 };
