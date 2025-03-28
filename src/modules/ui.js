@@ -1,26 +1,35 @@
-function UI(hotel) {
-  this.hotel = hotel;
-}
+class UI {
+  constructor(hotel) {
+    this.hotel = hotel;
+  }
 
-UI.prototype.renderRooms = function () {
-  const container = document.getElementById('roomsContainer');
-  container.innerHTML = '';
+  renderRooms() {
+    const container = document.getElementById('roomsContainer');
+    container.innerHTML = '';
 
-  this.hotel.rooms.forEach((room) => {
-    const roomDiv = document.createElement('div');
-    roomDiv.className = `room ${room.isAvailable ? '' : 'booked'}`;
-    roomDiv.innerHTML = `
+    this.hotel.rooms.forEach((room) => {
+      const isPremium = room.premiumService
+        ? `<p>Premium Service: ${room.premiumService}</p>`
+        : '';
+      const premiumClass = room.premiumService ? 'premium' : '';
+      const roomDiv = document.createElement('div');
+      roomDiv.className = `room ${
+        room.isAvailable ? '' : 'booked'
+      } ${premiumClass}`;
+      roomDiv.innerHTML = `
     <h3>Room ${room.number} (${room.type})</h3>
     <p>${room.isAvailable ? 'Available' : 'Booked'}</p>
+    ${isPremium}
     ${
       room.isAvailable
-        ? `<button onClick=bookRoom(${room.number})>Book Room</button>`
-        : `<button onClick=checkOutRoom(${room.number})>Check Out</button>`
+        ? `<button onclick="bookRoom(${room.number})">Book Room</button>`
+        : `<button onclick="checkOutRoom(${room.number})">Check Out</button>`
     }
     `;
 
-    container.appendChild(roomDiv);
-  });
-};
+      container.appendChild(roomDiv);
+    });
+  }
+}
 
 module.exports = UI;
