@@ -1,3 +1,5 @@
+require('./style.scss');
+
 const Room = require('./modules/room');
 const Hotel = require('./modules/hotel');
 const UI = require('./modules/ui');
@@ -37,7 +39,7 @@ function saveBookingsToLocalStorage() {
 
 loadBookingsFromLocalStorage();
 
-const ui = new UI(hotel);
+window.ui = new UI(hotel);
 ui.renderRooms();
 
 window.bookRoom = function (number) {

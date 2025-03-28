@@ -1,6 +1,7 @@
 class UI {
   constructor(hotel) {
     this.hotel = hotel;
+    this.expandedReviews = new Set();
   }
 
   renderRooms() {
@@ -9,7 +10,7 @@ class UI {
 
     this.hotel.rooms.forEach((room) => {
       const isPremium = room.premiumService
-        ? `<p>Premium Service: ${room.premiumService}</p>`
+        ? `<div class="premium-service">${room.premiumService}</div>`
         : '';
       const premiumClass = room.premiumService ? 'premium' : '';
       const roomDiv = document.createElement('div');
@@ -17,22 +18,52 @@ class UI {
         room.isAvailable ? '' : 'booked'
       } ${premiumClass}`;
       roomDiv.innerHTML = `
-    <h3>Room ${room.number} (${room.type})</h3>
-    <p>${room.isAvailable ? 'Available' : 'Booked'}</p>
-    ${isPremium}
-    ${
-      room.isAvailable
-        ? `<button onclick="bookRoom(${room.number})">Book Room</button>`
-        : `<button onclick="checkOutRoom(${room.number})">Check Out</button>`
-    }
-    <div id="reviewsContainer-${room.number}">
-      <button onclick="fetchReviews(${room.number})">Load reviews</button>
-      <div id="reviewsList-${room.number}"></div>
-    </div>
-    `;
+        <h3>Room ${room.number} (${room.type})</h3>
+        <p>${room.isAvailable ? 'Available' : 'Booked'}</p>
+        ${isPremium}
+        <div class="button-box">
+          ${
+            room.isAvailable
+              ? `<button onclick="bookRoom(${room.number})">Book Room</button>`
+              : `<button onclick="checkOutRoom(${room.number})">Check Out</button>`
+          }
+          <button onclick="ui.toggleReviews(${room.number})">Reviews</button>
+        </div>
+        <div id="reviewsContainer-${room.number}" class="reviews-container">
+          <div id="reviewsList-${room.number}"></div>
+        </div>
+      `;
 
       container.appendChild(roomDiv);
     });
+  }
+
+  toggleReviews(roomNumber) {
+    const reviewsContainer = document.getElementById(
+      `reviewsContainer-${roomNumber}`
+    );
+    const reviewsList = document.getElementById(`reviewsList-${roomNumber}`);
+    const button =
+      reviewsContainer.previousElementSibling.querySelector(
+        'button:last-child'
+      );
+
+    if (!reviewsList || !reviewsContainer) return;
+
+    if (this.expandedReviews.has(roomNumber)) {
+      reviewsContainer.classList.remove('visible');
+      button.textContent = 'Reviews';
+      this.expandedReviews.delete(roomNumber);
+    } else {
+      reviewsContainer.classList.add('visible');
+      button.textContent = 'Hide Reviews';
+
+      if (!reviewsList.children.length) {
+        window.fetchReviews(roomNumber);
+      }
+
+      this.expandedReviews.add(roomNumber);
+    }
   }
 
   displayReviews(roomNumber, reviews) {
