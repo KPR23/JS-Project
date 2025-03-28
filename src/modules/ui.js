@@ -14,8 +14,8 @@ UI.prototype.renderRooms = function () {
     <p>${room.isAvailable ? 'Available' : 'Booked'}</p>
     ${
       room.isAvailable
-        ? `<button onClick=bookRoom(${room.number})>Book Room</button>`
-        : `<button onClick=checkOutRoom(${room.number})>Check Out</button>`
+        ? `<button onclick="bookRoom(${room.number})">Book Room</button>`
+        : `<button onclick="checkOutRoom(${room.number})">Check Out</button>`
     }
     `;
 

@@ -16,4 +16,11 @@ class Room {
   }
 }
 
-module.exports = Room;
+class PremiumRoom extends Room {
+  constructor(number, type, premiumService) {
+    super(number, type);
+    this.premiumService = premiumService;
+  }
+}
+
+module.exports = { Room, PremiumRoom };
