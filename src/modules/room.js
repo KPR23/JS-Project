@@ -1,4 +1,6 @@
 class Room {
+  #creditCardNumber;
+
   constructor(number, type) {
     this.number = number;
     this.type = type;
@@ -6,13 +8,33 @@ class Room {
   }
 
   book() {
+    const creditCardNumber = prompt(
+      'Provide your credit card number to book the room'
+    );
+    if (!/^\d{16}$/.test(creditCardNumber)) {
+      alert('Credit card number must be 16 digits');
+    }
+    this.setCreditCardNumber(creditCardNumber);
     this.isAvailable = false;
-    return `Room ${this.number} has been booked`;
+    return `Room ${
+      this.number
+    } has been booked using this card: ${this.getMaskedCardNumber()}`;
   }
 
   checkOut() {
     this.isAvailable = true;
     return `Room ${this.number} has been checked out`;
+  }
+
+  setCreditCardNumber(number) {
+    if (!/^\d{16}$/.test(number)) {
+      throw new Error('Credit card number must be 16 digits');
+    }
+    this.#creditCardNumber = number;
+  }
+
+  getMaskedCardNumber() {
+    return '**** **** **** ' + this.#creditCardNumber.slice(-4);
   }
 }
 
