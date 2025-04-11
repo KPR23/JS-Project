@@ -1,14 +1,13 @@
-require('./style.scss');
+import './style.scss';
+import { Room, PremiumRoom } from './modules/room.js';
+import { UI } from './services/ui.js';
+import { Hotel } from './modules/hotel.js';
+import { HotelAPI } from './services/hotelAPI.js';
 
-const Room = require('./modules/room');
-const Hotel = require('./modules/hotel');
-const UI = require('./modules/ui');
-const HotelAPI = require('./modules/hotelAPI');
-
-const room1 = new Room.Room(1, 'Single');
-const room2 = new Room.Room(2, 'Double');
-const room3 = new Room.Room(3, 'Suite');
-const room4 = new Room.PremiumRoom(4, 'Premium', 'Breakfast');
+const room1 = new Room(1, 'Single');
+const room2 = new Room(2, 'Double');
+const room3 = new Room(3, 'Suite');
+const room4 = new PremiumRoom(4, 'Premium', 'Breakfast');
 
 const hotel = new Hotel('Grand Hotel');
 
@@ -40,7 +39,15 @@ function saveBookingsToLocalStorage() {
 loadBookingsFromLocalStorage();
 
 window.ui = new UI(hotel);
-ui.renderRooms();
+
+const savedUser = sessionStorage.getItem('user');
+if (savedUser) {
+  const user = JSON.parse(savedUser);
+  window.ui.authStatus(user);
+} else {
+  window.ui.renderLogin();
+}
+window.ui.renderRooms();
 
 window.bookRoom = function (number) {
   const room = hotel.rooms.find((room) => room.number === number);

@@ -1,4 +1,4 @@
-class Room {
+export class Room {
   #creditCardNumber;
 
   constructor(number, type) {
@@ -39,11 +39,9 @@ class Room {
   }
 }
 
-class PremiumRoom extends Room {
+export class PremiumRoom extends Room {
   constructor(number, type, premiumService) {
     super(number, type);
     this.premiumService = premiumService;
   }
 }
-
-module.exports = { Room, PremiumRoom };
