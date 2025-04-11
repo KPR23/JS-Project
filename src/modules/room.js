@@ -17,6 +17,7 @@ export class Room {
     }
     this.setCreditCardNumber(creditCardNumber);
     this.isAvailable = false;
+    this.bookedBy = bookedBy.username;
     return `Room ${
       this.number
     } has been booked using this card: ${this.getMaskedCardNumber()}`;
@@ -24,6 +25,7 @@ export class Room {
 
   checkOut() {
     this.isAvailable = true;
+
     return `Room ${this.number} has been checked out`;
   }
 

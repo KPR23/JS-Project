@@ -14,8 +14,8 @@ export class UI {
     form.innerHTML = `
       <input type="text" id="username" placeholder="Username">
       <input type="password" id="password" placeholder="Password">
-      <button type="button" onclick="ui.registerUser()">Register</button>
       <button type="button" onclick="ui.loginUser()">Login</button>
+      <button type="button" onclick="ui.registerUser()">Register</button>
       <div id="authStatus"></div>
     `;
 
@@ -67,11 +67,13 @@ export class UI {
     } else {
       this.renderLogin();
     }
+    this.renderRooms();
   }
 
   renderRooms() {
     const container = document.getElementById('roomsContainer');
     container.innerHTML = '';
+    const isLoggedIn = !!sessionStorage.getItem('user');
 
     this.hotel.rooms.forEach((room) => {
       const isPremium = room.premiumService
@@ -84,12 +86,14 @@ export class UI {
       } ${premiumClass}`;
       roomDiv.innerHTML = `
         <h3>Room ${room.number} (${room.type})</h3>
-        <p>${room.isAvailable ? 'Available' : 'Booked'}</p>
+        <p>${room.isAvailable ? 'Available' : 'Booked by ' + room.bookedBy}</p>
         ${isPremium}
         <div class="button-box">
           ${
             room.isAvailable
-              ? `<button onclick="bookRoom(${room.number})">Book Room</button>`
+              ? `<button class="bookButton ${
+                  !isLoggedIn ? 'disabled' : ''
+                }" onclick="bookRoom(${room.number})">Book Room</button>`
               : `<button onclick="checkOutRoom(${room.number})">Check Out</button>`
           }
           <button onclick="ui.toggleReviews(${room.number})">Reviews</button>

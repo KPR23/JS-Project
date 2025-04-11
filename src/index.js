@@ -50,6 +50,12 @@ if (savedUser) {
 window.ui.renderRooms();
 
 window.bookRoom = function (number) {
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  if (!user) {
+    alert('Please login to book a room');
+    document.getElementById('bookButton').disabled = true;
+    return;
+  }
   const room = hotel.rooms.find((room) => room.number === number);
   if (room) {
     alert(room.book());
@@ -62,6 +68,10 @@ window.checkOutRoom = function (number) {
   const room = hotel.rooms.find((room) => room.number === number);
   if (room) {
     alert(room.checkOut());
+    const button = document.getElementById('checkoutButton');
+    if (owner != room.bookedBy) {
+      button.disabled = true;
+    }
     saveBookingsToLocalStorage();
     ui.renderRooms();
   }
