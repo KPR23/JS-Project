@@ -20,10 +20,13 @@ function loadBookingsFromLocalStorage() {
   const savedBookings = localStorage.getItem('hotelBookings');
   if (savedBookings) {
     const bookings = JSON.parse(savedBookings);
-    bookings.forEach((roomNumber) => {
-      const room = hotel.rooms.find((room) => room.number === roomNumber);
+    bookings.forEach((booking) => {
+      const room = hotel.rooms.find(
+        (room) => room.number === booking.roomNumber
+      );
       if (room && room.isAvailable) {
         room.isAvailable = false;
+        room.bookedBy = booking.bookedBy;
       }
     });
   }
@@ -32,7 +35,10 @@ function loadBookingsFromLocalStorage() {
 function saveBookingsToLocalStorage() {
   const bookedRooms = hotel.rooms
     .filter((room) => !room.isAvailable)
-    .map((room) => room.number);
+    .map((room) => ({
+      roomNumber: room.number,
+      bookedBy: room.bookedBy,
+    }));
   localStorage.setItem('hotelBookings', JSON.stringify(bookedRooms));
 }
 
@@ -53,28 +59,34 @@ window.bookRoom = function (number) {
   const user = JSON.parse(sessionStorage.getItem('user'));
   if (!user) {
     alert('Please login to book a room');
-    document.getElementById('bookButton').disabled = true;
     return;
   }
   const room = hotel.rooms.find((room) => room.number === number);
   if (room) {
-    alert(room.book());
+    alert(room.book(user.username));
     saveBookingsToLocalStorage();
     ui.renderRooms();
   }
 };
 
 window.checkOutRoom = function (number) {
-  const room = hotel.rooms.find((room) => room.number === number);
-  if (room) {
-    alert(room.checkOut());
-    const button = document.getElementById('checkoutButton');
-    if (owner != room.bookedBy) {
-      button.disabled = true;
-    }
-    saveBookingsToLocalStorage();
-    ui.renderRooms();
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  if (!user) {
+    alert('Please login to check out a room');
+    return;
   }
+
+  const room = hotel.rooms.find((room) => room.number === number);
+  if (!room) return;
+
+  if (room.bookedBy && room.bookedBy !== user.username) {
+    alert('You can only check out rooms that you have booked');
+    return;
+  }
+
+  alert(room.checkOut());
+  saveBookingsToLocalStorage();
+  ui.renderRooms();
 };
 
 window.fetchReviews = async function (roomNumber) {
@@ -83,5 +95,29 @@ window.fetchReviews = async function (roomNumber) {
     ui.displayReviews(roomNumber, reviews);
   } catch (error) {
     alert('Failed to load reviews. Please try again later.');
+  }
+};
+
+window.addReview = async function () {
+  const email = document.getElementById('reviewEmail').value;
+  const roomNumber = parseInt(
+    document.getElementById('reviewRoomNumber').value
+  );
+  const body = document.getElementById('reviewBody').value;
+
+  if (!email || !roomNumber || !body) {
+    alert('Please fill in all review fields');
+    return;
+  }
+
+  try {
+    await HotelAPI.addReview(email, roomNumber, body);
+    alert('Review added successfully!');
+    document.getElementById('reviewEmail').value = '';
+    document.getElementById('reviewRoomNumber').value = '';
+    document.getElementById('reviewBody').value = '';
+    window.fetchReviews(roomNumber);
+  } catch (error) {
+    alert('Failed to add review. Please try again later.');
   }
 };

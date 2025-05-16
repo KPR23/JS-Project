@@ -74,6 +74,9 @@ export class UI {
     const container = document.getElementById('roomsContainer');
     container.innerHTML = '';
     const isLoggedIn = !!sessionStorage.getItem('user');
+    const currentUser = isLoggedIn
+      ? JSON.parse(sessionStorage.getItem('user')).username
+      : null;
 
     this.hotel.rooms.forEach((room) => {
       const isPremium = room.premiumService
@@ -84,9 +87,16 @@ export class UI {
       roomDiv.className = `room ${
         room.isAvailable ? '' : 'booked'
       } ${premiumClass}`;
+
+      const bookingInfo = room.isAvailable
+        ? 'Available'
+        : room.bookedBy
+        ? `Booked by ${room.bookedBy}`
+        : 'Booked';
+
       roomDiv.innerHTML = `
         <h3>Room ${room.number} (${room.type})</h3>
-        <p>${room.isAvailable ? 'Available' : 'Booked by ' + room.bookedBy}</p>
+        <p>${bookingInfo}</p>
         ${isPremium}
         <div class="button-box">
           ${
@@ -94,7 +104,12 @@ export class UI {
               ? `<button class="bookButton ${
                   !isLoggedIn ? 'disabled' : ''
                 }" onclick="bookRoom(${room.number})">Book Room</button>`
-              : `<button onclick="checkOutRoom(${room.number})">Check Out</button>`
+              : `<button onclick="checkOutRoom(${room.number})" ${
+                  !isLoggedIn ||
+                  (room.bookedBy && room.bookedBy !== currentUser)
+                    ? 'class="disabled"'
+                    : ''
+                }>Check Out</button>`
           }
           <button onclick="ui.toggleReviews(${room.number})">Reviews</button>
         </div>
@@ -118,12 +133,32 @@ export class UI {
       );
 
     if (!reviewsList || !reviewsContainer) return;
+    if (!reviewsList) {
+      reviewsList.innerHTML = '<p>No reviews yet</p>';
+    }
 
     if (this.expandedReviews.has(roomNumber)) {
       reviewsContainer.classList.remove('visible');
       button.textContent = 'Reviews';
       this.expandedReviews.delete(roomNumber);
     } else {
+      this.expandedReviews.forEach((num) => {
+        if (num !== roomNumber) {
+          const otherContainer = document.getElementById(
+            `reviewsContainer-${num}`
+          );
+          const otherButton =
+            otherContainer.previousElementSibling.querySelector(
+              'button:last-child'
+            );
+          if (otherContainer) {
+            otherContainer.classList.remove('visible');
+            if (otherButton) otherButton.textContent = 'Reviews';
+          }
+          this.expandedReviews.delete(num);
+        }
+      });
+
       reviewsContainer.classList.add('visible');
       button.textContent = 'Hide Reviews';
 
@@ -139,14 +174,22 @@ export class UI {
     const reviewsList = document.getElementById(`reviewsList-${roomNumber}`);
     if (!reviewsList) return;
 
-    reviewsList.innerHTML = reviews
-      .filter((review) => review.roomNumber === roomNumber)
+    const roomReviews = reviews.filter(
+      (review) => Number(review.roomNumber) === Number(roomNumber)
+    );
+
+    if (roomReviews.length === 0) {
+      reviewsList.innerHTML = '<p>No reviews yet</p>';
+      return;
+    }
+
+    reviewsList.innerHTML = roomReviews
       .slice(0, 3)
       .map(
         (review) => `
         <div class="review">
-          <h4>${review.email}</h4>
-          <p>${review.body}</p>
+        <h4>${review.email}</h4>
+        <p>${review.body}</p>
         </div>
       `
       )

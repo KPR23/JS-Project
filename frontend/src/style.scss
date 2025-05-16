@@ -19,6 +19,8 @@ body {
   gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  align-items: flex-start;
+  grid-auto-rows: min-content;
 }
 
 .room {
@@ -26,6 +28,10 @@ body {
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
 
   &.booked {
     background-color: $color-booked;
@@ -72,7 +78,8 @@ button {
   padding-top: 15px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   display: none;
-
+  overflow: hidden;
+  
   &.visible {
     display: block;
   }
@@ -112,4 +119,17 @@ button {
   #roomsContainer {
     grid-template-columns: 1fr;
   }
+}
+
+.review-input {
+  justify-content: center;
+  margin: 0 auto;
+  align-items: center;
+  display: flex;
+  width: 50%;
+  padding: 10px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
