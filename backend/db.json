@@ -1,27 +1,9 @@
 {
   "reviews": [
     {
-      "id": "IkLRw7frEWDYpHe0qv_2q",
-      "roomNumber": "101",
-      "email": "test@test.pl",
-      "body": "test"
-    },
-    {
-      "id": "3T3tYr0dSiaZ0SYKx2z7m",
-      "roomNumber": "101",
-      "email": "test@test.pl",
-      "body": "test"
-    },
-    {
-      "id": "bqGYujuYkdtp7WNt9fCZR",
-      "roomNumber": "101",
-      "email": "test@test.pl",
-      "body": "test"
-    },
-    {
-      "id": "Nz9_pqLPV4bfP4agt_8kR",
-      "roomNumber": "101",
-      "email": "test@test.pl",
+      "id": "xSXe6sgRvX_KnlYhhSzAR",
+      "roomNumber": 1,
+      "email": "zmi@asd.pl",
       "body": "test"
     }
   ]

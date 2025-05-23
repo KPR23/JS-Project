@@ -1,4 +1,5 @@
 import { registerUser, loginUser } from './userManager.js';
+import { HotelAPI } from './hotelAPI.js';
 
 export class UI {
   constructor(hotel) {
@@ -188,11 +189,38 @@ export class UI {
       .map(
         (review) => `
         <div class="review">
-        <h4>${review.email}</h4>
-        <p>${review.body}</p>
+          <div class="review-header">
+          <h4>${review.email}</h4>
+          <p>${review.body}</p>
+          </div>
+          <div class="review-actions">
+            <button onclick="ui.editReview('${review.id}', ${roomNumber})">Edit</button>
+          </div>
         </div>
       `
       )
       .join('');
+  }
+
+  editReview(id, roomNumber) {
+    const email = prompt('Enter your email:');
+    if (!email) return;
+
+    const body = prompt('Enter your review:');
+    if (!body) return;
+
+    HotelAPI.editReview(id, email, roomNumber, body)
+      .then(async (response) => {
+        alert('Review updated successfully!');
+        try {
+          const reviews = await HotelAPI.fetchReviews();
+          this.displayReviews(roomNumber, reviews);
+        } catch (error) {
+          alert('Failed to refresh reviews. Please try again.');
+        }
+      })
+      .catch((error) => {
+        alert('Failed to update review. Please try again later.');
+      });
   }
 }

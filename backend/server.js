@@ -36,3 +36,30 @@ app.post('/reviews', async (req, res) => {
   await db.write();
   res.json({ message: 'Review added successfully', review: newReview });
 });
+
+app.put('/reviews/:id', async (req, res) => {
+  const id = req.params.id;
+  const { roomNumber, email, body } = req.body;
+
+  await db.read();
+
+  const reviewIndex = db.data.reviews.findIndex((review) => review.id === id);
+
+  if (reviewIndex === -1) {
+    return res.status(404).json({ message: 'Review not found' });
+  }
+
+  db.data.reviews[reviewIndex] = {
+    ...db.data.reviews[reviewIndex],
+    roomNumber,
+    email,
+    body,
+  };
+
+  await db.write();
+
+  res.json({
+    message: 'Review updated successfully',
+    review: db.data.reviews[reviewIndex],
+  });
+});
