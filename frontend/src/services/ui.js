@@ -135,7 +135,9 @@ export class UI {
                     : ''
                 }>Check Out</button>`
           }
-          <button onclick="ui.toggleReviews(${room.number})">Reviews</button>
+          <button onclick="ui.toggleReviews(${room.number})" ${
+        counter > 0 ? '' : 'class="disabled"'
+      }>Reviews</button>
         </div>
        
         <div id="reviewsContainer-${room.number}" class="reviews-container">
@@ -164,6 +166,7 @@ export class UI {
 
     if (this.expandedReviews.has(roomNumber)) {
       reviewsContainer.classList.remove('visible');
+
       button.textContent = 'Reviews';
       this.expandedReviews.delete(roomNumber);
     } else {
