@@ -46,16 +46,18 @@ loadBookingsFromLocalStorage();
 
 window.ui = new UI(hotel);
 
-const savedUser = sessionStorage.getItem('user');
-if (savedUser) {
-  const user = JSON.parse(savedUser);
-  window.ui.authStatus(user);
-} else {
-  window.ui.renderLogin();
-}
-window.ui.renderRooms();
+(async () => {
+  const savedUser = sessionStorage.getItem('user');
+  if (savedUser) {
+    const user = JSON.parse(savedUser);
+    await window.ui.authStatus(user);
+  } else {
+    window.ui.renderLogin();
+    await window.ui.renderRooms();
+  }
+})();
 
-window.bookRoom = function (number) {
+window.bookRoom = async function (number) {
   const user = JSON.parse(sessionStorage.getItem('user'));
   if (!user) {
     alert('Please login to book a room');
@@ -65,11 +67,11 @@ window.bookRoom = function (number) {
   if (room) {
     alert(room.book(user.username));
     saveBookingsToLocalStorage();
-    ui.renderRooms();
+    await ui.renderRooms();
   }
 };
 
-window.checkOutRoom = function (number) {
+window.checkOutRoom = async function (number) {
   const user = JSON.parse(sessionStorage.getItem('user'));
   if (!user) {
     alert('Please login to check out a room');
@@ -86,7 +88,7 @@ window.checkOutRoom = function (number) {
 
   alert(room.checkOut());
   saveBookingsToLocalStorage();
-  ui.renderRooms();
+  await ui.renderRooms();
 };
 
 window.fetchReviews = async function (roomNumber) {

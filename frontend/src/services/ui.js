@@ -13,41 +13,54 @@ export class UI {
 
     const form = document.createElement('form');
     form.innerHTML = `
-      <input type="text" id="username" placeholder="Username">
-      <input type="password" id="password" placeholder="Password">
-      <button type="button" onclick="ui.loginUser()">Login</button>
-      <button type="button" onclick="ui.registerUser()">Register</button>
-      <div id="authStatus"></div>
+      <div class="input-row">
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+      </div>
+      <div class="button-row">
+        <button type="button" id="loginBtn">Login</button>
+        <button type="button" id="registerBtn">Register</button>
+      </div>
     `;
 
     container.appendChild(form);
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      await this.loginUser();
+    });
+
+    document
+      .getElementById('registerBtn')
+      .addEventListener('click', async () => {
+        await this.registerUser();
+      });
   }
 
-  loginUser() {
+  async loginUser() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const user = loginUser(username, password);
     if (user) {
       alert('Login successful!');
-      this.authStatus(user);
+      await this.authStatus(user);
     } else {
       alert('Invalid credentials');
     }
   }
 
-  registerUser() {
+  async registerUser() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     try {
       const user = registerUser(username, password);
       alert('Registration successful!');
-      this.authStatus(user);
+      await this.authStatus(user);
     } catch (error) {
       alert('Registration failed: ' + error.message);
     }
   }
 
-  authStatus(user) {
+  async authStatus(user) {
     const loginContainer = document.getElementById('loginContainer');
     loginContainer.innerHTML = '';
 
@@ -59,19 +72,19 @@ export class UI {
 
       const logoutButton = document.createElement('button');
       logoutButton.textContent = 'Logout';
-      logoutButton.onclick = () => {
+      logoutButton.onclick = async () => {
         sessionStorage.removeItem('user');
         this.renderLogin();
-        this.renderRooms();
+        await this.renderRooms();
       };
       loginContainer.appendChild(logoutButton);
     } else {
       this.renderLogin();
     }
-    this.renderRooms();
+    await this.renderRooms();
   }
 
-  renderRooms() {
+  async renderRooms() {
     const container = document.getElementById('roomsContainer');
     container.innerHTML = '';
     const isLoggedIn = !!sessionStorage.getItem('user');
@@ -79,7 +92,17 @@ export class UI {
       ? JSON.parse(sessionStorage.getItem('user')).username
       : null;
 
+    let reviews = [];
+    try {
+      reviews = await HotelAPI.fetchReviews();
+    } catch (error) {
+      console.warn('Failed to fetch reviews:', error);
+    }
+
     this.hotel.rooms.forEach((room) => {
+      const counter = reviews.filter(
+        (r) => r.roomNumber === room.number
+      ).length;
       const isPremium = room.premiumService
         ? `<div class="premium-service">${room.premiumService}</div>`
         : '';
@@ -88,7 +111,6 @@ export class UI {
       roomDiv.className = `room ${
         room.isAvailable ? '' : 'booked'
       } ${premiumClass}`;
-
       const bookingInfo = room.isAvailable
         ? 'Available'
         : room.bookedBy
@@ -99,6 +121,7 @@ export class UI {
         <h3>Room ${room.number} (${room.type})</h3>
         <p>${bookingInfo}</p>
         ${isPremium}
+         <p>${counter > 0 ? 'Reviews: ' + counter : 'No reviews yet'}</p>
         <div class="button-box">
           ${
             room.isAvailable
@@ -114,6 +137,7 @@ export class UI {
           }
           <button onclick="ui.toggleReviews(${room.number})">Reviews</button>
         </div>
+       
         <div id="reviewsContainer-${room.number}" class="reviews-container">
           <div id="reviewsList-${room.number}"></div>
         </div>
@@ -195,6 +219,7 @@ export class UI {
           </div>
           <div class="review-actions">
             <button onclick="ui.editReview('${review.id}', ${roomNumber})">Edit</button>
+            <button onclick="ui.deleteReview('${review.id}')">Delete</button>
           </div>
         </div>
       `
@@ -222,5 +247,23 @@ export class UI {
       .catch((error) => {
         alert('Failed to update review. Please try again later.');
       });
+  }
+
+  deleteReview(id) {
+    if (confirm('Are you sure you want to delete this review?')) {
+      HotelAPI.deleteReview(id)
+        .then(async (response) => {
+          try {
+            const reviews = await HotelAPI.fetchReviews();
+            this.displayReviews(roomNumber, reviews);
+            alert('Review deleted successfully!');
+          } catch (error) {
+            alert('Failed to refresh reviews. Please try again.');
+          }
+        })
+        .catch((error) => {
+          alert('Failed to delete review. Please try again later.');
+        });
+    }
   }
 }

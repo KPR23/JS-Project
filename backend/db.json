@@ -1,9 +1,21 @@
 {
   "reviews": [
     {
-      "id": "xSXe6sgRvX_KnlYhhSzAR",
+      "id": "1I5dy2yxIvNl82asERqqK",
       "roomNumber": 1,
-      "email": "zmi@asd.pl",
+      "email": "test",
+      "body": "xd"
+    },
+    {
+      "id": "9KdccseUCz26b6SrAfgDr",
+      "roomNumber": 1,
+      "email": "test",
+      "body": "test"
+    },
+    {
+      "id": "bq3air9HB5OyccVhRHVU2",
+      "roomNumber": 2,
+      "email": "kacper.zabludowski24@gmail.com",
       "body": "test"
     }
   ]

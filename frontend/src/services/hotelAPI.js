@@ -25,4 +25,14 @@ export class HotelAPI {
     });
     return await res.json();
   }
+
+  static async deleteReview(id) {
+    const res = await fetch(`http://localhost:8000/reviews/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return await res.json();
+  }
 }
