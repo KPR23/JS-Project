@@ -3,6 +3,7 @@ import { Room, PremiumRoom } from './modules/room.js';
 import { UI } from './services/ui.js';
 import { Hotel } from './modules/hotel.js';
 import { HotelAPI } from './services/hotelAPI.js';
+import { getCurrentUser } from './services/userManager.js';
 
 const room1 = new Room(1, 'Single');
 const room2 = new Room(2, 'Double');
@@ -47,10 +48,9 @@ loadBookingsFromLocalStorage();
 window.ui = new UI(hotel);
 
 (async () => {
-  const savedUser = sessionStorage.getItem('user');
-  if (savedUser) {
-    const user = JSON.parse(savedUser);
-    await window.ui.authStatus(user);
+  const currentUser = getCurrentUser();
+  if (currentUser) {
+    await window.ui.authStatus(currentUser);
   } else {
     window.ui.renderLogin();
     await window.ui.renderRooms();
@@ -58,7 +58,7 @@ window.ui = new UI(hotel);
 })();
 
 window.bookRoom = async function (number) {
-  const user = JSON.parse(sessionStorage.getItem('user'));
+  const user = getCurrentUser();
   if (!user) {
     alert('Please login to book a room');
     return;
@@ -72,7 +72,7 @@ window.bookRoom = async function (number) {
 };
 
 window.checkOutRoom = async function (number) {
-  const user = JSON.parse(sessionStorage.getItem('user'));
+  const user = getCurrentUser();
   if (!user) {
     alert('Please login to check out a room');
     return;

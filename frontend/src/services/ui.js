@@ -1,4 +1,9 @@
-import { registerUser, loginUser } from './userManager.js';
+import {
+  registerUser,
+  loginUser,
+  getCurrentUser,
+  logoutUser,
+} from './userManager.js';
 import { HotelAPI } from './hotelAPI.js';
 
 export class UI {
@@ -73,7 +78,7 @@ export class UI {
       const logoutButton = document.createElement('button');
       logoutButton.textContent = 'Logout';
       logoutButton.onclick = async () => {
-        sessionStorage.removeItem('user');
+        logoutUser();
         this.renderLogin();
         await this.renderRooms();
       };
@@ -87,10 +92,9 @@ export class UI {
   async renderRooms() {
     const container = document.getElementById('roomsContainer');
     container.innerHTML = '';
-    const isLoggedIn = !!sessionStorage.getItem('user');
-    const currentUser = isLoggedIn
-      ? JSON.parse(sessionStorage.getItem('user')).username
-      : null;
+    const currentUser = getCurrentUser();
+    const isLoggedIn = !!currentUser;
+    const username = currentUser ? currentUser.username : null;
 
     let reviews = [];
     try {
@@ -129,8 +133,7 @@ export class UI {
                   !isLoggedIn ? 'disabled' : ''
                 }" onclick="bookRoom(${room.number})">Book Room</button>`
               : `<button onclick="checkOutRoom(${room.number})" ${
-                  !isLoggedIn ||
-                  (room.bookedBy && room.bookedBy !== currentUser)
+                  !isLoggedIn || (room.bookedBy && room.bookedBy !== username)
                     ? 'class="disabled"'
                     : ''
                 }>Check Out</button>`

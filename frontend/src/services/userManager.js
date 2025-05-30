@@ -19,6 +19,8 @@ export function registerUser(username, password) {
   }
   const user = new User(username, password);
   saveUser(user);
+  sessionStorage.setItem('user', JSON.stringify(user));
+
   return user;
 }
 
@@ -28,8 +30,19 @@ export function loginUser(username, password) {
   const userData = JSON.parse(storedUser);
   const user = new User(userData.username, userData.password);
   if (user.username === username && user.validatePassword(password)) {
-    localStorage.setItem('currentUser', JSON.stringify(user));
+    sessionStorage.setItem('user', JSON.stringify(userData));
     return user;
   }
   return null;
+}
+
+export function getCurrentUser() {
+  const storedUser = sessionStorage.getItem('user');
+  if (!storedUser) return null;
+  const userData = JSON.parse(storedUser);
+  return new User(userData.username, userData.password);
+}
+
+export function logoutUser() {
+  sessionStorage.removeItem('user');
 }
